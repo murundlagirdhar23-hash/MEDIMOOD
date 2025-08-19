@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEDIMOOD - Your Health Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --light-blue: #e0f2fe;
+            --medical-green: #059669;
+            --warning-orange: #f59e0b;
+            --danger-red: #dc2626;
+            --soft-gray: #f8fafc;
+            --dark-gray: #334155;
+            --white: #ffffff;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f0f9ff 50%, #ffffff 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Medical background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(30, 58, 138, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.02) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Medical icons floating animation */
+        .floating-icon {
+            position: fixed;
+            color: rgba(30, 58, 138, 0.05);
+            z-index: -1;
+            animation: float 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .floating-icon:nth-child(1) { top: 10%; left: 10%; font-size: 2rem; animation-delay: 0s; }
+        .floating-icon:nth-child(2) { top: 20%; right: 15%; font-size: 1.5rem; animation-delay: -5s; }
+        .floating-icon:nth-child(3) { bottom: 30%; left: 20%; font-size: 2.5rem; animation-delay: -10s; }
+        .floating-icon:nth-child(4) { bottom: 20%; right: 10%; font-size: 1.8rem; animation-delay: -15s; }
+        .floating-icon:nth-child(5) { top: 60%; left: 5%; font-size: 2.2rem; animation-delay: -7s; }
+        .floating-icon:nth-child(6) { top: 80%; right: 25%; font-size: 1.6rem; animation-delay: -12s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.05; }
+            25% { transform: translateY(-20px) rotate(5deg); opacity: 0.08; }
+            50% { transform: translateY(-40px) rotate(-3deg); opacity: 0.05; }
+            75% { transform: translateY(-20px) rotate(2deg); opacity: 0.08; }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            margin: 20px 0;
+            padding: 40px;
+            text-align: center;
+            color: var(--white);
+            box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .fa-user-md {
+            font-size: 1.2em;
+            margin-right: 10px;
+            color: var(--accent-teal);
+        }
+        
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            margin: 20px 0;
+            box-shadow: 0 15px 35px rgba(30, 58, 138, 0.08);
+            border: 1px solid rgba(20, 184, 166, 0.1);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--secondary-blue));
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .form-section h3 {
+            color: var(--primary-blue);
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .form-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--secondary-blue));
+            border-radius: 2px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: 14px 18px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.15);
+            background-color: var(--white);
+        }
+
+        .form-control:hover, .form-select:hover {
+            border-color: var(--secondary-blue);
+        }
+
+        /* Updated slider styles with medical theme */
+        .slider-container {
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .form-range {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 10px;
+            border-radius: 8px;
+            background: #e2e8f0;
+            outline: none;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .slider-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 10px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--medical-green), var(--accent-teal));
+            width: 0%;
+            z-index: 1;
+            pointer-events: none;
+            transition: width 0.2s ease;
+        }
+
+        /* Webkit browsers (Chrome, Safari, Edge) */
+        .form-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-teal), var(--medical-green));
+            cursor: pointer;
+            border: 3px solid var(--white);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+            position: relative;
+            z-index: 3;
+        }
+
+        .form-range::-webkit-slider-track {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 10px;
+            border-radius: 8px;
+            background: transparent;
+        }
+
+        /* Firefox */
+        .form-range::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-teal), var(--medical-green));
+            cursor: pointer;
+            border: 3px solid var(--white);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+            -moz-appearance: none;
+        }
+
+        .form-range::-moz-range-track {
+            height: 10px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+        }
+
+        .form-range::-moz-range-progress {
+            height: 10px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--medical-green), var(--accent-teal));
+        }
+        
+        .btn-predict {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border: none;
+            padding: 18px 60px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--white);
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 30px;
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-predict::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-predict:hover::before {
+            left: 100%;
+        }
+        
+        .btn-predict:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(30, 58, 138, 0.3);
+            color: var(--white);
+        }
+        
+        .results-section {
+            margin-top: 40px;
+            display: none;
+        }
+        
+        .result-card {
+            border-radius: 20px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(30, 58, 138, 0.1);
+            border: 1px solid rgba(20, 184, 166, 0.1);
+        }
+        
+        .result-header {
+            padding: 25px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+        }
+
+        .heart-header {
+            background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        }
+
+        .mental-header {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue)) !important;
+        }
+        
+        .result-body {
+            padding: 30px;
+            background: var(--white);
+        }
+        
+        .risk-badge {
+            font-size: 1.6rem;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            padding: 12px 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            position: relative;
+            padding-left: 25px;
+            color: var(--dark-gray);
+        }
+
+        .tips-list li::before {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--medical-green);
+            position: absolute;
+            left: 0;
+            top: 12px;
+        }
+        
+        .confidence {
+            font-size: 1.2rem;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--primary-blue);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--accent-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .icon {
+            font-size: 2.2rem;
+            margin-right: 15px;
+        }
+        
+        .section-icon {
+            color: var(--accent-teal);
+            margin-right: 12px;
+            font-size: 1.1em;
+        }
+
+        .form-text {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-size: 1.1rem !important;
+            padding: 8px 15px !important;
+            background: linear-gradient(135deg, var(--accent-teal), var(--medical-green)) !important;
+        }
+
+        .alert {
+            border-radius: 15px;
+            border: none;
+            padding: 20px;
+            font-size: 1.05rem;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(20, 184, 166, 0.1));
+            color: var(--primary-blue);
+            border-left: 4px solid var(--accent-teal);
+        }
+
+        /* Medical themed color classes */
+        .bg-success { background: linear-gradient(135deg, var(--medical-green), #10b981) !important; }
+        .bg-warning { background: linear-gradient(135deg, var(--warning-orange), #f97316) !important; }
+        .bg-danger { background: linear-gradient(135deg, var(--danger-red), #ef4444) !important; }
+        .bg-info { background: linear-gradient(135deg, var(--secondary-blue), var(--accent-teal)) !important; }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .form-section {
+                padding: 25px 20px;
+            }
+            
+            .btn-predict {
+                padding: 15px 40px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating medical icons -->
+    <div class="floating-icon"><i class="fas fa-stethoscope"></i></div>
+    <div class="floating-icon"><i class="fas fa-heartbeat"></i></div>
+    <div class="floating-icon"><i class="fas fa-user-md"></i></div>
+    <div class="floating-icon"><i class="fas fa-pills"></i></div>
+    <div class="floating-icon"><i class="fas fa-syringe"></i></div>
+    <div class="floating-icon"><i class="fas fa-microscope"></i></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-user-md"></i> MEDIMOOD</h1>
+            <p>Your Personal Health Risk Assessment Assistant</p>
+            <p><small>Get instant predictions for heart disease and mental health risks with personalized tips</small></p>
+        </div>
+
+        <!-- Health Assessment Form -->
+        <div class="row">
+            <!-- Basic Information -->
+            <div class="col-md-12">
+                <div class="form-section">
+                    <h3><i class="fas fa-user section-icon"></i>Basic Information</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Your Age</label>
+                                <input type="number" class="form-control" id="age" min="18" max="100" required>
+                                <small class="form-text text-muted">Enter your age in years</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" id="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="0">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Heart Health Section -->
+            <div class="col-md-6">
+                <div class="form-section">
+                    <h3><i class="fas fa-heart section-icon"></i>Heart Health Information</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Chest Pain Type</label>
+                        <select class="form-select" id="chest_pain" required>
+                            <option value="">Select Type</option>
+                            <option value="0">No chest pain</option>
+                            <option value="1">Mild chest discomfort</option>
+                            <option value="2">Moderate chest pain</option>
+                            <option value="3">Severe chest pain</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Blood Pressure (when resting)</label>
+                        <input type="number" class="form-control" id="resting_bp" min="80" max="200" placeholder="e.g. 120" required>
+                        <small class="form-text text-muted">Normal is around 120. Higher numbers may indicate high blood pressure</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Cholesterol Level</label>
+                        <input type="number" class="form-control" id="cholesterol" min="100" max="500" placeholder="e.g. 200" required>
+                        <small class="form-text text-muted">Normal is below 200. Higher numbers may be concerning</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">High Blood Sugar</label>
+                        <select class="form-select" id="blood_sugar" required>
+                            <option value="">Select</option>
+                            <option value="0">No, my blood sugar is normal</option>
+                            <option value="1">Yes, I have high blood sugar/diabetes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Heart Test (ECG) Results</label>
+                        <select class="form-select" id="resting_ecg" required>
+                            <option value="">Select Result</option>
+                            <option value="0">Normal heart rhythm</option>
+                            <option value="1">Minor heart rhythm changes</option>
+                            <option value="2">Abnormal heart rhythm</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Maximum Heart Rate During Exercise</label>
+                        <input type="number" class="form-control" id="max_heart_rate" min="60" max="220" placeholder="e.g. 150" required>
+                        <small class="form-text text-muted">How fast your heart beats during exercise (normal is 120-180)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Chest Pain During Exercise</label>
+                        <select class="form-select" id="exercise_pain" required>
+                            <option value="">Select</option>
+                            <option value="0">No, I don't get chest pain during exercise</option>
+                            <option value="1">Yes, I get chest pain during exercise</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Heart Stress Test Result</label>
+                        <input type="number" class="form-control" id="oldpeak" min="0" max="10" step="0.1" placeholder="e.g. 1.0" required>
+                        <small class="form-text text-muted">A number from heart stress test (0 = normal, higher = more concerning)</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mental Health Section -->
+            <div class="col-md-6">
+                <div class="form-section">
+                    <h3><i class="fas fa-brain section-icon"></i>Mental Health Information</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Stress Level (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="stress_level_fill"></div>
+                            <input type="range" class="form-range" id="stress_level" min="1" max="10" value="1" oninput="updateSliderValue('stress_level', 'stress_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="stress_value">1</span>
+                            <small class="form-text text-muted d-block">1 = Very relaxed, 10 = Extremely stressed</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Sleep Quality (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="sleep_quality_fill"></div>
+                            <input type="range" class="form-range" id="sleep_quality" min="1" max="10" value="1" oninput="updateSliderValue('sleep_quality', 'sleep_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="sleep_value">1</span>
+                            <small class="form-text text-muted d-block">1 = Very poor sleep, 10 = Excellent sleep</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Social Support (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="social_support_fill"></div>
+                            <input type="range" class="form-range" id="social_support" min="1" max="10" value="1" oninput="updateSliderValue('social_support', 'support_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="support_value">1</span>
+                            <small class="form-text text-muted d-block">1 = No support, 10 = Strong family/friends support</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Work-Life Balance (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="work_life_balance_fill"></div>
+                            <input type="range" class="form-range" id="work_life_balance" min="1" max="10" value="1" oninput="updateSliderValue('work_life_balance', 'balance_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="balance_value">1</span>
+                            <small class="form-text text-muted d-block">1 = Very poor balance, 10 = Perfect balance</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Anxiety Level (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="anxiety_level_fill"></div>
+                            <input type="range" class="form-range" id="anxiety_level" min="1" max="10" value="1" oninput="updateSliderValue('anxiety_level', 'anxiety_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="anxiety_value">1</span>
+                            <small class="form-text text-muted d-block">1 = No anxiety, 10 = Severe anxiety</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mood Changes (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="mood_changes_fill"></div>
+                            <input type="range" class="form-range" id="mood_changes" min="1" max="10" value="1" oninput="updateSliderValue('mood_changes', 'mood_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="mood_value">1</span>
+                            <small class="form-text text-muted d-block">1 = Stable mood, 10 = Frequent mood swings</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Energy Level (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="energy_level_fill"></div>
+                            <input type="range" class="form-range" id="energy_level" min="1" max="10" value="1" oninput="updateSliderValue('energy_level', 'energy_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="energy_value">1</span>
+                            <small class="form-text text-muted d-block">1 = No energy, 10 = Very energetic</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Concentration Level (1-10)</label>
+                        <div class="slider-container">
+                            <div class="slider-fill" id="concentration_fill"></div>
+                            <input type="range" class="form-range" id="concentration" min="1" max="10" value="1" oninput="updateSliderValue('concentration', 'concentration_value')">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="badge bg-info" id="concentration_value">1</span>
+                            <small class="form-text text-muted d-block">1 = Cannot focus, 10 = Perfect focus</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Predict Button -->
+        <div class="text-center">
+            <button type="button" class="btn btn-predict" onclick="generateReport()">
+                <i class="fas fa-chart-line"></i> Generate Health Report
+            </button>
+        </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p class="mt-3">Analyzing your health data...</p>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="results" class="results-section">
+            <!-- Heart Results -->
+            <div class="result-card">
+                <div class="result-header heart-header" id="heart-header">
+                    <i class="fas fa-heart icon"></i>Heart Health Assessment
+                </div>
+                <div class="result-body">
+                    <div class="risk-badge" id="heart-risk-badge"></div>
+                    <div class="confidence" id="heart-confidence"></div>
+                    <h5 class="mt-4 mb-3"><i class="fas fa-lightbulb section-icon"></i>Recommendations for You:</h5>
+                    <ul class="tips-list" id="heart-tips"></ul>
+                </div>
+            </div>
+            
+            <!-- Mental Health Results -->
+            <div class="result-card">
+                <div class="result-header mental-header" id="mental-header">
+                    <i class="fas fa-brain icon"></i>Mental Health Assessment
+                </div>
+                <div class="result-body">
+                    <div class="risk-badge" id="mental-risk-badge"></div>
+                    <div class="confidence" id="mental-confidence"></div>
+                    <h5 class="mt-4 mb-3"><i class="fas fa-lightbulb section-icon"></i>Recommendations for You:</h5>
+                    <ul class="tips-list" id="mental-tips"></ul>
+                </div>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle"></i>
+                <strong>Important:</strong> This assessment is for informational purposes only and should not replace professional medical advice. 
+                Please consult with healthcare professionals for proper diagnosis and treatment.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update slider values and background
+        function updateSliderValue(sliderId, displayId) {
+            const slider = document.getElementById(sliderId);
+            const display = document.getElementById(displayId);
+            const fillElement = document.getElementById(sliderId + '_fill');
+            const value = slider.value;
+            const min = slider.min ? slider.min : 1;
+            const max = slider.max ? slider.max : 10;
+            
+            // Update display
+            display.textContent = value;
+            
+            // Calculate percentage for background
+            const percentage = ((value - min) / (max - min)) * 100;
+            
+            // Update the fill element width
+            if (fillElement) {
+                fillElement.style.width = percentage + '%';
+            }
+        }
+        
+        // Form validation
+        function validateForm() {
+            const requiredFields = [
+                'age', 'gender', 'chest_pain', 'resting_bp', 'cholesterol', 
+                'blood_sugar', 'resting_ecg', 'max_heart_rate', 'exercise_pain', 'oldpeak'
+            ];
+            
+            for (let field of requiredFields) {
+                const element = document.getElementById(field);
+                if (!element.value) {
+                    alert(`Please fill in: ${element.previousElementSibling.textContent}`);
+                    element.focus();
+                    return false;
+                }
+            }
+            
+            // Age validation
+            const age = parseInt(document.getElementById('age').value);
+            if (age < 18 || age > 100) {
+                alert('Please enter a valid age between 18 and 100');
+                return false;
+            }
+            
+            // Blood pressure validation
+            const bp = parseInt(document.getElementById('resting_bp').value);
+            if (bp < 80 || bp > 200) {
+                alert('Please enter a valid blood pressure between 80 and 200');
+                return false;
+            }
+            
+            // Cholesterol validation
+            const cholesterol = parseInt(document.getElementById('cholesterol').value);
+            if (cholesterol < 100 || cholesterol > 500) {
+                alert('Please enter a valid cholesterol level between 100 and 500');
+                return false;
+            }
+            
+            // Heart rate validation
+            const heartRate = parseInt(document.getElementById('max_heart_rate').value);
+            if (heartRate < 60 || heartRate > 220) {
+                alert('Please enter a valid heart rate between 60 and 220');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Generate health report
+        async function generateReport() {
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            // Collect form data
+            const data = {
+                age: document.getElementById('age').value,
+                sex: document.getElementById('gender').value,
+                chest_pain: document.getElementById('chest_pain').value,
+                resting_bp: document.getElementById('resting_bp').value,
+                cholesterol: document.getElementById('cholesterol').value,
+                blood_sugar: document.getElementById('blood_sugar').value,
+                resting_ecg: document.getElementById('resting_ecg').value,
+                max_heart_rate: document.getElementById('max_heart_rate').value,
+                exercise_pain: document.getElementById('exercise_pain').value,
+                oldpeak: document.getElementById('oldpeak').value,
+                gender: document.getElementById('gender').value,
+                stress_level: document.getElementById('stress_level').value,
+                sleep_quality: document.getElementById('sleep_quality').value,
+                social_support: document.getElementById('social_support').value,
+                work_life_balance: document.getElementById('work_life_balance').value,
+                anxiety_level: document.getElementById('anxiety_level').value,
+                mood_changes: document.getElementById('mood_changes').value,
+                energy_level: document.getElementById('energy_level').value,
+                concentration: document.getElementById('concentration').value
+            };
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.success) {
+                    displayResults(result);
+                } else {
+                    alert('Error: ' + result.error);
+                }
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                alert('Network error. Please check if the server is running.');
+                console.error('Error:', error);
+            }
+        }
+        
+        // Display results
+        function displayResults(result) {
+            // Heart results
+            const heartBadge = document.getElementById('heart-risk-badge');
+            heartBadge.textContent = result.heart_risk;
+            heartBadge.className = `risk-badge bg-${result.heart_color} text-white`;
+            
+            document.getElementById('heart-confidence').innerHTML = 
+                `<strong>Confidence: ${result.heart_confidence}</strong>`;
+            
+            const heartTips = document.getElementById('heart-tips');
+            heartTips.innerHTML = '';
+            result.heart_tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.textContent = tip;
+                heartTips.appendChild(li);
+            });
+            
+            // Mental health results
+            const mentalBadge = document.getElementById('mental-risk-badge');
+            mentalBadge.textContent = result.mental_risk;
+            mentalBadge.className = `risk-badge bg-${result.mental_color} text-white`;
+            
+            document.getElementById('mental-confidence').innerHTML = 
+                `<strong>Confidence: ${result.mental_confidence}</strong>`;
+            
+            const mentalTips = document.getElementById('mental-tips');
+            mentalTips.innerHTML = '';
+            result.mental_tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.textContent = tip;
+                mentalTips.appendChild(li);
+            });
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+            
+            // Smooth scroll to results
+            document.getElementById('results').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+        
+        // Initialize slider values on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sliders = ['stress_level', 'sleep_quality', 'social_support', 'work_life_balance', 
+                            'anxiety_level', 'mood_changes', 'energy_level', 'concentration'];
+            
+            sliders.forEach(slider => {
+                const displayId = slider.includes('sleep') ? 'sleep_value' :
+                                slider.includes('support') ? 'support_value' :
+                                slider.includes('balance') ? 'balance_value' :
+                                slider.includes('anxiety') ? 'anxiety_value' :
+                                slider.includes('mood') ? 'mood_value' :
+                                slider.includes('energy') ? 'energy_value' :
+                                slider.includes('concentration') ? 'concentration_value' :
+                                slider + '_value';
+                
+                updateSliderValue(slider, displayId);
+            });
+        });
+    </script>
+</body>
+</html>
